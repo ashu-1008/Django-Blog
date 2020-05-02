@@ -1,0 +1,199 @@
+{% extends 'base.html'%}
+
+{% block title %}
+BlogPost
+{% endblock title %}
+
+{% block blogactive %}active{% endblock blogactive %}
+
+{% block css %}
+#comment, .reply {
+border:none;
+overflow: visible;
+resize: none;
+outline: none;
+resize:none;
+width: 100%;
+height: auto;
+border-bottom: 2px solid black;
+}
+#comment:focus, .reply:focus{
+border:none;
+overflow: visible;
+resize: none;
+outline: none;
+resize:none;
+width: max-width;
+height: auto;
+border-bottom: 2px solid blue;
+}
+#commentButton {
+display: none;
+float: right;
+}
+@media only screen and (max-width: 800px) {
+    .mob-size{
+        width:25%!important;
+    }
+}
+{% endblock %}
+{% block body %}
+{% load humanize %}
+{% load extras %}
+<main class="container my-3">
+    <div class="row">
+        <div class="col-md-8 blog-main">
+            <h3 class="pb-3 mb-4 font-italic border-bottom">
+                From the AAPY Programmers
+            </h3>
+
+            <div class="blog-post">
+                <h2 class="blog-post-title">{{post.title}}</h2>
+                <p class="blog-post-meta">{{post.timeStamp}} by <a href="#">{{post.author}}</a></p>
+                <p>{{post.content}}</p>
+            </div>
+        </div><!-- /.blog-main -->
+
+        <aside class="col-md-4 blog-sidebar">
+            <div class="p-3 mb-3 bg-light rounded">
+                <h4 class="font-italic">About</h4>
+                <p class="mb-0">Hello guys, it's<em> pythonX.</em> It is one of the best teche Blog Page. </p>
+            </div>
+
+
+            <div class="p-3">
+                <h4 class="font-italic">Elsewhere</h4>
+                <ol class="list-unstyled">
+                    <li><a href="https://github.com/ashu-1008">GitHub</a></li>
+                    <li><a href="https://twitter.com/AshwinSariwal">Twitter</a></li>
+                </ol>
+            </div>
+        </aside><!-- /.blog-sidebar -->
+
+    </div>
+</main>
+<div class="container">
+    <div class="row">
+        <div class="col-md-8">
+            <h2>Comments ({{comments.count}})</h2>
+            <form action="/blog/postComment/" method="post">
+                {% csrf_token %}
+                <div class="form-group">
+                    <input id="comment" name="comment" placeholder="Add a public comment..."
+                           onclick="allowComment(commentButton)" autocomplete="off" required>
+                    <input type="hidden" name="parentSno" value="">
+                    <br>
+                    <input type="hidden" name="postSno" value="{{post.sno}}">
+                    <p id="commentButton">
+                        <button class="my-2 btn btn-secondary" id="cancleButton" onclick="hideButton(commentButton)"
+                                type="button">cancel
+                        </button>
+                        <button class="my-2 btn btn-primary" type="submit">submit</button>
+                    </p>
+                </div>
+            </form>
+            <div class="row my-4">
+                {% for comment in comments %}
+                <div class="col-md-1 otherComment p-0 my-3">
+                    <img class="mob-size rounded mx-auto d-block w-100" src="/static/blog/user_icon.png" alt="">
+                </div>
+                <div class="col-md-11 pl-3 my-3">
+                    <b>{{comment.user.username}}</b> <span class="badge badge-secondary">{{comment.timeStamp | naturaltime}}</span>
+                    <div>{{comment.comment}}</div>
+                    <div>
+                        <button class="btn btn-sm btn-primary my-2" type="button" data-toggle="collapse"
+                                aria-expanded="false"
+                                aria-controls="reply{{comment.sno}}" onclick="allowReply('#' + 'reply{{comment.sno}}')">
+                            Reply
+                        </button>
+                        <div class="collapse" id="reply{{comment.sno}}">
+                            <form action="/blog/postComment/" method="post">
+                                {% csrf_token %}
+                                <div class="form-group">
+                                    <input class="reply" name="comment" placeholder="Add a public reply..."
+                                           autocomplete="off" required>
+                                    <input type="hidden" name="parentSno" value="{{comment.sno}}">
+                                    <br>
+                                    <p style="display: block">
+                                        <input type="hidden" name="postSno" value="{{post.sno}}">
+                                        <button class="my-2 btn btn-secondary" data-toggle="collapse"
+                                                data-target="#reply{{comment.sno}}">
+                                            cancel
+                                        </button>
+                                        <button class="my-2 btn btn-primary" type="submit">submit</button>
+                                    </p>
+                                </div>
+                            </form>
+                        </div>
+                        {% for reply in replyDict|get_val:comment.sno %}
+                        <div class="replies my-2 row">
+
+                            <div class="col-md-1 otherComment p-0 my-3">
+                                <img class="mob-size rounded mx-auto d-block w-100" src="/static/blog/user_icon.png" alt="">
+                            </div>
+                            <div class="col-md-11 my-3">
+                            <b>{{reply.user.username}}</b> <span class="badge badge-secondary">{{reply.timeStamp | naturaltime}}</span>
+                            <div>{{reply.comment}}</div>
+                                </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock body %}
+
+{% block js %}
+
+<!--function to allow to comment-->
+function allowComment(id){
+
+{% if user.is_authenticated %}
+showButton(id);
+console.log("user is auth");
+
+{% else %}
+console.log("user is not auth");
+
+$('#commentModal').modal('show');
+
+{% endif %}
+}
+
+<!--function to allow to reply-->
+function allowReply(id){
+{% if user.is_authenticated %}
+$(id).collapse('toggle');
+console.log("user is auth");
+
+{% else %}
+console.log("user is not auth");
+$('#commentModal').modal('show');
+{% endif %}
+}
+
+<!--function to show submit button and cancel-->
+function showButton(id){
+console.log("showButton")
+id.style.display = "block";
+element = document.getElementsByClassName("otherComment");
+Array.from(element).forEach(function(ele){
+ele.style.paddingLeft = "0px";
+}
+)
+
+}
+function hideButton(id){
+id.style.display = "none";
+element = document.getElementsByClassName("otherComment");
+Array.from(element).forEach(function(ele){
+ele.style.paddingLeft = "15px";
+ele.style.paddingRight = "15px";}
+)
+}
+
+{% endblock %}
