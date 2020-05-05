@@ -28,7 +28,7 @@ SECRET_KEY = 'rpb1v_27(zsr)#*o-4%dfa2*9gcozi8opmx*q13s_6n!p!vyl1'
 # DEBUG = True
 DEBUG = False
 
-ALLOWED_HOSTS = ['pythonx1008.herokuapp.com']
+ALLOWED_HOSTS = ['.herokuapp.com']
 
 
 # Application definition
