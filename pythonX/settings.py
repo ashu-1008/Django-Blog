@@ -28,7 +28,7 @@ SECRET_KEY = 'rpb1v_27(zsr)#*o-4%dfa2*9gcozi8opmx*q13s_6n!p!vyl1'
 # DEBUG = True
 DEBUG = False
 
-ALLOWED_HOSTS = ['.herokuapp.com']
+ALLOWED_HOSTS = ['herokuapp.com']
 
 
 # Application definition
@@ -53,7 +53,6 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware',
 ]
 
 ROOT_URLCONF = 'pythonX.urls'
@@ -134,4 +133,3 @@ MESSAGE_TAGS = {
 }
 
 django_heroku.settings(locals())
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
